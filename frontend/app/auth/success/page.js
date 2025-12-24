@@ -1,34 +1,30 @@
 "use client";
 
-import { useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, Suspense } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 
-export default function AuthSuccess() {
-  const router = useRouter();
+function AuthSuccessContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
 
   useEffect(() => {
-    /**
-     * WHY:
-     * - Backend sends JWT via query param
-     * - We extract it here
-     */
     const token = searchParams.get("token");
 
     if (token) {
-      /**
-       * WHY localStorage (temporary):
-       * - Easy to implement
-       * - Later we’ll move to httpOnly cookies
-       */
       localStorage.setItem("token", token);
-
-      // Redirect user to homepage
-      router.push("/");
+      router.replace("/");
     } else {
-      router.push("/SignIn");
+      router.replace("/SignIn");
     }
-  }, []);
+  }, [searchParams, router]);
 
-  return <p>Logging you in...</p>;
+  return <p className="text-center mt-10">Signing you in...</p>;
+}
+
+export default function AuthSuccessPage() {
+  return (
+    <Suspense fallback={<p className="text-center mt-10">Loading...</p>}>
+      <AuthSuccessContent />
+    </Suspense>
+  );
 }
