@@ -1,60 +1,98 @@
 "use client";
 
-import { useParams } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { fetchProductById } from "../productsView";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/pagination";
 import "swiper/css/navigation";
 import { Autoplay, Pagination, Navigation } from "swiper/modules";
 
+/* Utility */
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
 export default function ProductPage() {
   const params = useParams();
+  const router = useRouter();
   const productId = params.id;
 
   const [product, setProduct] = useState(null);
-  const [cart, setCart] = useState([]);
   const [selectedSize, setSelectedSize] = useState(null);
   const [selectedQuantity, setSelectedQuantity] = useState(1);
   const [loading, setLoading] = useState(true);
 
-  // 🔹 Fetch product safely (backend has NO /:id route)
+  /* ================= FETCH PRODUCT ================= */
   useEffect(() => {
-    const fetchProduct = async () => {
+    const loadProduct = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/products", {
-          cache: "no-store",
-        });
+        const data = await fetchProductById(productId);
 
-        if (!res.ok) throw new Error("Failed to fetch products");
-
-        const data = await res.json();
-        const foundProduct = data.find((p) => p._id === productId);
-
-        setProduct(foundProduct || null);
-        setSelectedSize(foundProduct?.sizes?.[0] || null);
+        if (!data) {
+          setProduct(null);
+        } else {
+          setProduct(data);
+          setSelectedSize(data.sizes?.[0]?.name || null);
+        }
       } catch (error) {
-        console.error(error);
+        console.error("Failed to load product", error);
+        setProduct(null);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchProduct();
+    loadProduct();
   }, [productId]);
+  /* ================================================ */
 
-  // 🔹 Load cart from localStorage
-  useEffect(() => {
-    const storedCart = localStorage.getItem("cart");
-    if (storedCart) {
-      setCart(JSON.parse(storedCart));
+  /* ================= ADD TO CART ================= */
+  const addToCart = async () => {
+    const token = localStorage.getItem("token");
+
+    // 1️⃣ User must be logged in
+    if (!token) {
+      alert("Please login to add items to cart");
+      router.push("/SignIn");
+      return;
     }
-  }, []);
 
+    // 2️⃣ Size validation
+    if (!selectedSize) {
+      alert("Please select a size");
+      return;
+    }
+
+    try {
+      const res = await fetch("http://localhost:5000/api/cart/add", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          productId: product.id, // normalized ID
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        throw new Error(data.message || "Failed to add to cart");
+      }
+
+      alert("Product added to cart successfully");
+      router.push("/Cart");
+    } catch (error) {
+      console.error("Add to cart error:", error);
+      alert("Something went wrong while adding to cart");
+    }
+  };
+  /* =============================================== */
+
+  /* ================= UI STATES ================= */
   if (loading) {
     return <div className="p-10">Loading product...</div>;
   }
@@ -62,27 +100,7 @@ export default function ProductPage() {
   if (!product) {
     return <div className="p-10">Product not found</div>;
   }
-
-  const handleQuantity = (e) => {
-    setSelectedQuantity(Number(e.target.value));
-  };
-
-  const addToCart = () => {
-    const newItem = {
-      id: product._id,
-      name: product.name,
-      price: product.price,
-      size: selectedSize,
-      quantity: selectedQuantity,
-      image: product.images?.[0],
-    };
-
-    const updatedCart = [...cart, newItem];
-    setCart(updatedCart);
-    localStorage.setItem("cart", JSON.stringify(updatedCart));
-    alert("Product added to cart");
-    window.location.href = "/Cart";
-  };
+  /* ============================================= */
 
   return (
     <div className="bg-white">
@@ -101,8 +119,8 @@ export default function ProductPage() {
             {product.images.map((img, index) => (
               <SwiperSlide key={index} className="relative h-full">
                 <img
-                  src={`http://localhost:5000${img}`}
-                  alt={product.name}
+                  src={`http://localhost:5000${img.src}`}
+                  alt={img.alt}
                   className="w-full h-full object-contain"
                 />
               </SwiperSlide>
@@ -120,7 +138,7 @@ export default function ProductPage() {
 
           <div className="mt-4 lg:row-span-3 lg:mt-0">
             <p className="text-3xl tracking-tight text-gray-900">
-              ₹{product.price}
+              {product.price}
             </p>
 
             {/* SIZE */}
@@ -129,16 +147,16 @@ export default function ProductPage() {
               <div className="mt-4 grid grid-cols-4 gap-4">
                 {product.sizes.map((size) => (
                   <button
-                    key={size}
-                    onClick={() => setSelectedSize(size)}
+                    key={size.name}
+                    onClick={() => setSelectedSize(size.name)}
                     className={classNames(
                       "border px-4 py-2 rounded",
-                      selectedSize === size
+                      selectedSize === size.name
                         ? "border-indigo-600 ring-2 ring-indigo-500"
                         : "border-gray-300"
                     )}
                   >
-                    {size}
+                    {size.name}
                   </button>
                 ))}
               </div>
@@ -152,7 +170,7 @@ export default function ProductPage() {
               <input
                 type="number"
                 value={selectedQuantity}
-                onChange={handleQuantity}
+                onChange={(e) => setSelectedQuantity(Number(e.target.value))}
                 className="w-full px-4 py-2 border rounded"
                 min={1}
               />

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { FaSearch, FaShoppingCart } from "react-icons/fa";
+import { FaSearch, FaShoppingCart, FaSignOutAlt } from "react-icons/fa";
 import { CgProfile } from "react-icons/cg";
 import { HiMenu } from "react-icons/hi";
 
@@ -33,8 +33,8 @@ export const Header = ({ onSearch }) => {
         const res = await fetch("http://localhost:5000/api/users/me", {
           method: "GET",
           headers: {
-            Authorization: `Bearer ${token}`
-          }
+            Authorization: `Bearer ${token}`,
+          },
         });
 
         const data = await res.json();
@@ -105,22 +105,22 @@ export const Header = ({ onSearch }) => {
 
   return (
     <header className="bg-white shadow-md sticky top-0 z-50">
-      <nav role="navigation" className="container mx-auto px-4 sm:px-6 py-3">
+      <nav className="container mx-auto px-4 sm:px-6 py-3">
         <div className="flex items-center justify-between flex-wrap">
           {/* LOGO */}
           <div className="flex items-center flex-shrink-0 mr-6">
             <img
-              src="https://media.istockphoto.com/id/1665714191/vector/shoes-shop.jpg?s=612x612&w=0&k=20&c=bFQXXwYhDyN0SQPgfWy8x_qIpIDRx7ckuojuh2MU1fI="
-              alt="Company logo"
-              className="w-16 sm:w-24 h-auto"
-            />
+  src="/logoheader.png"
+  alt="Company logo"
+  className="w-16 sm:w-24 h-auto rounded-lg"
+/>
           </div>
 
           {/* MOBILE MENU BUTTON */}
           <div className="block lg:hidden">
             <button
               onClick={toggleMenu}
-              className="flex items-center px-3 py-2 border rounded text-gray-500 border-gray-500 hover:text-gray-700 hover:border-gray-700"
+              className="flex items-center px-3 py-2 border rounded text-gray-500 border-gray-500"
             >
               <HiMenu size={24} />
             </button>
@@ -139,57 +139,48 @@ export const Header = ({ onSearch }) => {
               <NavLink href="/ContactUs">Contact</NavLink>
             </div>
 
-            {/* SEARCH + USER INFO + ICONS */}
+            {/* SEARCH + USER */}
             <div className="mt-4 lg:mt-0 flex flex-col sm:flex-row items-center">
               <form
                 onSubmit={handleSearchSubmit}
-                className="flex items-center mb-2 sm:mb-0 sm:mr-2"
+                className="flex items-center mb-2 sm:mb-0 sm:mr-3"
               >
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={handleSearchChange}
                   placeholder="Search"
-                  className="border border-gray-300 rounded px-2 py-1 w-full sm:w-auto"
+                  className="border border-gray-300 rounded px-2 py-1"
                 />
-                <button
-                  type="submit"
-                  className="text-gray-600 hover:text-gray-700 ml-2"
-                >
-                  <FaSearch size={22} />
+                <button type="submit" className="ml-2">
+                  <FaSearch size={20} />
                 </button>
               </form>
 
               {/* WELCOME USER */}
               {isLoggedIn && userName && (
-                <span className="mr-3 text-sm text-gray-700">
+                <span className="mr-4 text-sm text-gray-700">
                   Welcome, <strong>{userName}</strong>
                 </span>
               )}
 
-              <div className="flex items-center mt-2 sm:mt-0">
-                <Link
-                  href="/Cart"
-                  className="text-gray-600 hover:text-gray-700 mr-4"
-                >
+              <div className="flex items-center">
+                <Link href="/Cart" className="mr-4">
                   <FaShoppingCart size={22} />
                 </Link>
 
-                {/* AUTH ICON */}
+                {/* AUTH ACTION */}
                 {!isLoggedIn ? (
-                  <Link
-                    href="/SignIn"
-                    className="text-gray-600 hover:text-gray-700"
-                  >
+                  <Link href="/SignIn">
                     <CgProfile size={22} />
                   </Link>
                 ) : (
                   <button
                     onClick={logoutHandler}
-                    className="text-gray-600 hover:text-gray-700"
-                    title="Logout"
+                    className="flex items-center gap-1 text-red-600 hover:text-red-700"
                   >
-                    <CgProfile size={22} />
+                    <FaSignOutAlt size={18} />
+                    <span className="text-sm">Logout</span>
                   </button>
                 )}
               </div>
