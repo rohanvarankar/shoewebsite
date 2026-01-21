@@ -167,31 +167,63 @@ const page = () => {
             </section>
 
             {/* LATEST SHOES */}
-            <section className="container mx-auto px-4 sm:px-6 py-8 sm:py-16">
-              <h2 className="text-3xl font-bold mb-6">Latest Shoes</h2>
+<section className="container mx-auto px-4 sm:px-6 py-12 sm:py-20">
+  <h2 className="text-3xl font-bold text-slate-900 mb-10">
+    Latest Shoes
+  </h2>
 
-              {latestLoading ? (
-                <p>Loading latest shoes...</p>
-              ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                  {latestProducts.map((product) => (
-                    <Link
-                      key={product._id}
-                      href={`/ShoeList/${product._id}`}
-                      className="bg-white rounded shadow p-4 hover:scale-105 transition"
-                    >
-                      <img
-                        src={`http://localhost:5000${product.images?.[0]}`}
-                        alt={product.name}
-                        className="h-48 w-full object-cover"
-                      />
-                      <h3 className="font-bold mt-3">{product.name}</h3>
-                      <p className="text-blue-600">₹{product.price}</p>
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </section>
+  {latestLoading ? (
+    <p className="text-slate-600">Loading latest shoes...</p>
+  ) : (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+      {latestProducts.map((product) => (
+        <div
+          key={product._id}
+          className="group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden"
+        >
+          {/* IMAGE */}
+          <div className="relative h-56 bg-slate-100 overflow-hidden">
+            <img
+              src={`http://localhost:5000${product.images?.[0]}`}
+              alt={product.name}
+              className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
+            />
+          </div>
+
+          {/* CONTENT */}
+          <div className="p-5">
+            <h3 className="text-lg font-semibold text-slate-900 mb-1">
+              {product.name}
+            </h3>
+
+            <p className="text-indigo-600 font-bold text-lg mb-4">
+              ₹{product.price}
+            </p>
+
+            {/* ACTION BUTTONS */}
+            <div className="flex flex-col gap-2">
+              {/* VIEW PRODUCT */}
+              <Link href={`/ShoeList/${product._id}`}>
+                <button className="w-full py-2 rounded-lg bg-indigo-600 text-white font-medium hover:bg-indigo-700 transition">
+                  View Product
+                </button>
+              </Link>
+
+              {/* ADD TO CART */}
+              <button
+                onClick={() => handleAddToCart(product._id)}
+                className="w-full py-2 rounded-lg border border-slate-300 text-slate-800 font-medium hover:bg-slate-100 transition"
+              >
+                Add to Cart
+              </button>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  )}
+</section>
+
           </main>
 
           <Footer />

@@ -1,5 +1,6 @@
 import Cart from "../models/Cart.model.js";
 
+
 /**
  * ADD ITEM TO CART
  * POST /api/cart/add
@@ -72,6 +73,55 @@ export const getMyCart = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       message: "Failed to fetch cart",
+    });
+  }
+};
+
+
+export const removeFromCart = async (req, res) => {
+  try {
+    // 1️⃣ Logged-in user id (from auth middleware)
+    const userId = req.user._id;
+
+    // 2️⃣ Product id to remove (from URL)
+    const { productId } = req.params;
+
+    if (!productId) {
+      return res.status(400).json({
+        success: false,
+        message: "Product ID is required",
+      });
+    }
+
+    // 3️⃣ Find user's cart
+    const cart = await Cart.findOne({ user: userId });
+
+    if (!cart) {
+      return res.status(404).json({
+        success: false,
+        message: "Cart not found",
+      });
+    }
+
+    // 4️⃣ Remove the product from items array
+    cart.items = cart.items.filter(
+      (item) => item.product.toString() !== productId
+    );
+
+    // 5️⃣ Save updated cart
+    await cart.save();
+
+    // 6️⃣ Send response
+    res.status(200).json({
+      success: true,
+      message: "Item removed from cart",
+      cart,
+    });
+  } catch (error) {
+    console.error("Remove from cart error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error",
     });
   }
 };

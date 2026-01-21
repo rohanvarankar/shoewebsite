@@ -17,7 +17,6 @@ export default function AddProductPage() {
     setLoading(true);
 
     try {
-      // 1️⃣ Create FormData (IMPORTANT for multer)
       const formData = new FormData();
 
       formData.append("name", name);
@@ -26,18 +25,15 @@ export default function AddProductPage() {
       formData.append("stock", stock);
       formData.append("description", description);
 
-      // sizes: "7,8,9" → [7,8,9]
       sizes
         .split(",")
         .map((s) => s.trim())
         .forEach((size) => formData.append("sizes", size));
 
-      // images: multiple files
       for (let i = 0; i < images.length; i++) {
         formData.append("images", images[i]);
       }
 
-      // 2️⃣ API call (NO Content-Type header)
       const res = await fetch("http://localhost:5000/api/products", {
         method: "POST",
         body: formData,
@@ -49,7 +45,6 @@ export default function AddProductPage() {
 
       alert("✅ Product added successfully!");
 
-      // 3️⃣ Reset form
       setName("");
       setBrand("");
       setPrice("");
@@ -66,80 +61,128 @@ export default function AddProductPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
-      <div className="max-w-xl mx-auto bg-white p-6 rounded-lg shadow">
-        <h1 className="text-2xl font-bold mb-6">Add New Shoe</h1>
+    <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4 py-12">
+      <div className="w-full max-w-2xl bg-white rounded-2xl shadow-lg p-8 sm:p-10">
+        {/* HEADER */}
+        <div className="mb-8 text-center">
+          <h1 className="text-3xl font-bold text-slate-900">
+            Add New Shoe
+          </h1>
+          <p className="text-slate-500 mt-2">
+            Fill in the details to add a new product to the store
+          </p>
+        </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <input
-            type="text"
-            placeholder="Shoe Name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="w-full p-2 border rounded"
-            required
-          />
+        {/* FORM */}
+        <form onSubmit={handleSubmit} className="space-y-5">
+          {/* NAME */}
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">
+              Shoe Name
+            </label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none transition"
+              required
+            />
+          </div>
 
-          <input
-            type="text"
-            placeholder="Brand"
-            value={brand}
-            onChange={(e) => setBrand(e.target.value)}
-            className="w-full p-2 border rounded"
-            required
-          />
+          {/* BRAND */}
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">
+              Brand
+            </label>
+            <input
+              type="text"
+              value={brand}
+              onChange={(e) => setBrand(e.target.value)}
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none transition"
+              required
+            />
+          </div>
 
-          <input
-            type="number"
-            placeholder="Price"
-            value={price}
-            onChange={(e) => setPrice(e.target.value)}
-            className="w-full p-2 border rounded"
-            required
-          />
+          {/* PRICE & STOCK */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">
+                Price (₹)
+              </label>
+              <input
+                type="number"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none transition"
+                required
+              />
+            </div>
 
-          <input
-            type="text"
-            placeholder="Sizes (e.g. 7,8,9)"
-            value={sizes}
-            onChange={(e) => setSizes(e.target.value)}
-            className="w-full p-2 border rounded"
-            required
-          />
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">
+                Stock
+              </label>
+              <input
+                type="number"
+                value={stock}
+                onChange={(e) => setStock(e.target.value)}
+                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none transition"
+                required
+              />
+            </div>
+          </div>
 
-          <input
-            type="number"
-            placeholder="Stock"
-            value={stock}
-            onChange={(e) => setStock(e.target.value)}
-            className="w-full p-2 border rounded"
-            required
-          />
+          {/* SIZES */}
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">
+              Sizes
+            </label>
+            <input
+              type="text"
+              placeholder="e.g. 7,8,9"
+              value={sizes}
+              onChange={(e) => setSizes(e.target.value)}
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none transition"
+              required
+            />
+          </div>
 
-          {/* 🔥 FILE UPLOAD */}
-          <input
-            type="file"
-            multiple
-            accept="image/*"
-            onChange={(e) => setImages(e.target.files)}
-            className="w-full p-2 border rounded"
-            required
-          />
+          {/* IMAGES */}
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">
+              Product Images
+            </label>
+            <input
+              type="file"
+              multiple
+              accept="image/*"
+              onChange={(e) => setImages(e.target.files)}
+              className="w-full px-3 py-2 border rounded-lg bg-slate-50 cursor-pointer"
+              required
+            />
+          </div>
 
-          <textarea
-            placeholder="Description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            className="w-full p-2 border rounded"
-            required
-          />
+          {/* DESCRIPTION */}
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">
+              Description
+            </label>
+            <textarea
+              rows="4"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none transition resize-none"
+              required
+            />
+          </div>
 
+          {/* SUBMIT */}
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-black text-white py-2 rounded hover:bg-gray-800 disabled:opacity-50"
+            className="w-full mt-6 py-3 rounded-lg bg-indigo-600 text-white font-semibold hover:bg-indigo-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? "Adding..." : "Add Product"}
+            {loading ? "Adding Product..." : "Add Product"}
           </button>
         </form>
       </div>

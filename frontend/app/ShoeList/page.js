@@ -53,7 +53,6 @@ export default function ShoeListPage() {
   const handleAddToCart = async (productId) => {
     const token = localStorage.getItem("token");
 
-    // 1️⃣ User must be logged in
     if (!token) {
       alert("Please login to add items to cart");
       router.push("/SignIn");
@@ -88,61 +87,65 @@ export default function ShoeListPage() {
     <>
       <Header onSearch={handleSearch} />
 
-      <div className="bg-white">
-        <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
-          <h2 className="text-2xl font-bold tracking-tight text-gray-900">
+      <section className="bg-slate-50 min-h-screen">
+        <div className="max-w-7xl mx-auto px-4 py-16">
+          <h2 className="text-3xl font-bold text-slate-900 mb-10">
             {searchQuery
-              ? `Search Results for "${searchQuery}"`
+              ? `Search results for “${searchQuery}”`
               : "All Products"}
           </h2>
 
-          <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {displayProducts.map((product) => (
-              <div key={product._id} className="group relative border p-3 rounded">
+              <div
+                key={product._id}
+                className="group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden"
+              >
                 {/* IMAGE */}
-                <div className="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-md bg-gray-200 lg:h-80 group-hover:opacity-75">
+                <div className="relative h-64 bg-slate-100 overflow-hidden">
                   <img
                     src={`http://localhost:5000${product.images?.[0]}`}
                     alt={product.name}
-                    className="h-full w-full object-cover object-center"
+                    className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                 </div>
 
                 {/* INFO */}
-                <div className="mt-4 flex justify-between">
-                  <div>
-                    <h3 className="text-sm text-gray-700">
-                      <Link href={`/ShoeList/${product._id}`}>
-                        {product.name}
-                      </Link>
-                    </h3>
-                    <p className="text-sm text-gray-500">{product.brand}</p>
-                  </div>
-                  <p className="text-sm font-medium text-gray-900">
+                <div className="p-4">
+                  <h3 className="text-base font-semibold text-slate-900">
+                    <Link href={`/ShoeList/${product._id}`}>
+                      {product.name}
+                    </Link>
+                  </h3>
+                  <p className="text-sm text-slate-500 mt-1">
+                    {product.brand}
+                  </p>
+
+                  <p className="text-lg font-bold text-slate-900 mt-3">
                     ₹{product.price}
                   </p>
-                </div>
 
-                {/* ACTIONS */}
-                <div className="mt-3 flex flex-col gap-2">
-                  <Link href={`/ShoeList/${product._id}`}>
-                    <button className="bg-blue-600 w-full text-white px-2 py-1 rounded-md hover:bg-blue-700">
-                      View Product
+                  {/* ACTIONS */}
+                  <div className="mt-4 flex flex-col gap-2">
+                    <Link href={`/ShoeList/${product._id}`}>
+                      <button className="w-full py-2 rounded-lg bg-indigo-600 text-white font-medium hover:bg-indigo-700 transition">
+                        View Product
+                      </button>
+                    </Link>
+
+                    <button
+                      onClick={() => handleAddToCart(product._id)}
+                      className="w-full py-2 rounded-lg border border-slate-300 text-slate-800 font-medium hover:bg-slate-100 transition"
+                    >
+                      Add to Cart
                     </button>
-                  </Link>
-
-                  <button
-                    onClick={() => handleAddToCart(product._id)}
-                    className="bg-black w-full text-white px-2 py-1 rounded-md hover:bg-gray-800"
-                  >
-                    Add to Cart
-                  </button>
+                  </div>
                 </div>
               </div>
             ))}
           </div>
         </div>
-      </div>
+      </section>
 
       <Footer />
     </>

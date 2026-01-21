@@ -8,6 +8,7 @@ import productRoutes from "./routes/productRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import cartRoutes from "./routes/cartRoutes.js";
+import orderRoutes from "./routes/orderRoutes.js"; // ✅ NEW
 
 // 🔹 IMPORTANT: load Google OAuth strategy
 import "./auth/google.strategy.js";
@@ -20,7 +21,7 @@ const app = express();
 app.use(
   cors({
     origin: "http://localhost:3000",
-    credentials: true
+    credentials: true,
   })
 );
 
@@ -39,7 +40,8 @@ app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 // ======================
 app.use("/api/products", productRoutes);
 app.use("/api/users", userRoutes);
-app.use("/api/cart", cartRoutes); // ✅ NOW CORRECT
+app.use("/api/cart", cartRoutes);
+app.use("/api/orders", orderRoutes); // ✅ REGISTERED
 app.use("/auth", authRoutes);
 
 export default app;
