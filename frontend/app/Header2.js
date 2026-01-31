@@ -109,6 +109,11 @@ const Header2 = () => {
             <NavLink href="/ShoeList">Products</NavLink>
             <NavLink href="/About">About</NavLink>
             <NavLink href="/ContactUs">Contact</NavLink>
+
+            {/* ✅ MY ORDERS (LOGGED IN ONLY) */}
+            {isLoggedIn && (
+              <NavLink href="/my-orders">My Orders</NavLink>
+            )}
           </div>
 
           {/* USER ACTIONS */}
@@ -152,6 +157,11 @@ const Header2 = () => {
             <NavLink href="/ShoeList">Products</NavLink>
             <NavLink href="/About">About</NavLink>
             <NavLink href="/ContactUs">Contact</NavLink>
+
+            {/* ✅ MY ORDERS (MOBILE) */}
+            {isLoggedIn && (
+              <NavLink href="/my-orders">My Orders</NavLink>
+            )}
 
             <div className="pt-3 border-t border-slate-200 flex items-center gap-4">
               <Link

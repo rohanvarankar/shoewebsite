@@ -2,9 +2,11 @@ import Order from "../models/Order.model.js";
 import Cart from "../models/Cart.model.js";
 
 /**
- * @desc    Create new order from cart
+ * =====================================================
+ * CREATE NEW ORDER FROM CART
  * @route   POST /api/orders
  * @access  Private
+ * =====================================================
  */
 export const createOrder = async (req, res) => {
   try {
@@ -22,7 +24,7 @@ export const createOrder = async (req, res) => {
       });
     }
 
-    // 2️⃣ Validate address (from request body)
+    // 2️⃣ Validate address
     const {
       fullName,
       phone,
@@ -82,9 +84,10 @@ export const createOrder = async (req, res) => {
       totalAmount,
       paymentMethod: "online",
       paymentStatus: "pending",
+      orderStatus: "placed",
     });
 
-    // 6️⃣ Clear cart after order creation
+    // 6️⃣ Clear cart
     cart.items = [];
     await cart.save();
 
@@ -98,6 +101,67 @@ export const createOrder = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Failed to create order",
+    });
+  }
+};
+
+/**
+ * =====================================================
+ * GET LOGGED-IN USER ORDERS
+ * @route   GET /api/orders/my
+ * @access  Private
+ * =====================================================
+ */
+export const getMyOrders = async (req, res) => {
+  try {
+    const orders = await Order.find({ user: req.user._id })
+      .populate("items.product", "name images price")
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      count: orders.length,
+      orders,
+    });
+  } catch (error) {
+    console.error("Get my orders error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch orders",
+    });
+  }
+};
+
+/**
+ * =====================================================
+ * GET SINGLE ORDER DETAILS
+ * @route   GET /api/orders/:id
+ * @access  Private
+ * =====================================================
+ */
+export const getOrderById = async (req, res) => {
+  try {
+    const order = await Order.findOne({
+      _id: req.params.id,
+      user: req.user._id,
+    }).populate("items.product", "name images price");
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: "Order not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      order,
+    });
+  } catch (error) {
+    console.error("Get order by id error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch order",
     });
   }
 };

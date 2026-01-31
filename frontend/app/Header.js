@@ -101,7 +101,7 @@ export const Header = ({ onSearch }) => {
             />
           </Link>
 
-          {/* MOBILE MENU */}
+          {/* MOBILE MENU BUTTON */}
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             className="lg:hidden p-2 rounded-md border border-slate-300 text-slate-600"
@@ -115,6 +115,9 @@ export const Header = ({ onSearch }) => {
             <NavLink href="/ShoeList">Products</NavLink>
             <NavLink href="/About">About</NavLink>
             <NavLink href="/ContactUs">Contact</NavLink>
+
+            {/* ✅ MY ORDERS (LOGGED IN ONLY) */}
+            {isLoggedIn && <NavLink href="/my-orders">My Orders</NavLink>}
           </div>
 
           {/* SEARCH + USER */}
@@ -146,7 +149,10 @@ export const Header = ({ onSearch }) => {
             </Link>
 
             {!isLoggedIn ? (
-              <Link href="/SignIn" className="text-slate-700 hover:text-indigo-600">
+              <Link
+                href="/SignIn"
+                className="text-slate-700 hover:text-indigo-600"
+              >
                 <CgProfile size={22} />
               </Link>
             ) : (
@@ -168,6 +174,9 @@ export const Header = ({ onSearch }) => {
             <NavLink href="/ShoeList">Products</NavLink>
             <NavLink href="/About">About</NavLink>
             <NavLink href="/ContactUs">Contact</NavLink>
+
+            {/* ✅ MY ORDERS (MOBILE) */}
+            {isLoggedIn && <NavLink href="/my-orders">My Orders</NavLink>}
           </div>
         )}
       </nav>

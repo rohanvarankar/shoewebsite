@@ -4,14 +4,15 @@ import jwt from "jsonwebtoken";
  * Generate JWT token
  * WHY:
  * - JWT allows stateless authentication
- * - Frontend can store token and send it with every request
+ * - Role is embedded for authorization (RBAC)
  */
 const generateToken = (user) => {
   return jwt.sign(
     {
       id: user._id,
       email: user.email,
-      role: "user"
+      role: user.role,          // ✅ FIX: dynamic role
+      isBlocked: user.isBlocked // ✅ useful for admin checks
     },
     process.env.JWT_SECRET,
     {
@@ -24,23 +25,26 @@ const generateToken = (user) => {
  * Google OAuth Success Handler
  * WHY:
  * - Passport already attached user to req.user
- * - We just need to generate token and redirect
+ * - We generate JWT and redirect to frontend
  */
 export const googleAuthSuccess = async (req, res) => {
   try {
     if (!req.user) {
-      return res.redirect(`${process.env.FRONTEND_URL}/login?error=auth_failed`);
+      return res.redirect(
+        `${process.env.FRONTEND_URL}/login?error=auth_failed`
+      );
     }
 
     const token = generateToken(req.user);
 
-    // Redirect with token (temporary approach)
-    // Later we’ll switch to httpOnly cookies
+    // Redirect with token
     res.redirect(
       `${process.env.FRONTEND_URL}/auth/success?token=${token}`
     );
   } catch (error) {
     console.error("Auth Controller Error:", error);
-    res.redirect(`${process.env.FRONTEND_URL}/login?error=server_error`);
+    res.redirect(
+      `${process.env.FRONTEND_URL}/login?error=server_error`
+    );
   }
 };

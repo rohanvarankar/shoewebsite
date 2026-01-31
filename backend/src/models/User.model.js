@@ -32,9 +32,24 @@ const userSchema = new mongoose.Schema(
     isVerified: {
       type: Boolean,
       default: true
+    },
+
+    // 🔐 ADMIN SUPPORT (NEW)
+    role: {
+      type: String,
+      enum: ["user", "admin"],
+      default: "user"
+    },
+
+    // 🚫 USER CONTROL (NEW)
+    isBlocked: {
+      type: Boolean,
+      default: false
     }
   },
-  { timestamps: true }
+  {
+    timestamps: true
+  }
 );
 
 const User = mongoose.model("User", userSchema);

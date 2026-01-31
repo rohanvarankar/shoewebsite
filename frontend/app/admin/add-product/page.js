@@ -25,10 +25,13 @@ export default function AddProductPage() {
       formData.append("stock", stock);
       formData.append("description", description);
 
-      sizes
-        .split(",")
-        .map((s) => s.trim())
-        .forEach((size) => formData.append("sizes", size));
+      // ✅ FIX: SEND SIZES AS JSON STRING
+      formData.append(
+        "sizes",
+        JSON.stringify(
+          sizes.split(",").map((s) => Number(s.trim()))
+        )
+      );
 
       for (let i = 0; i < images.length; i++) {
         formData.append("images", images[i]);
@@ -75,7 +78,6 @@ export default function AddProductPage() {
 
         {/* FORM */}
         <form onSubmit={handleSubmit} className="space-y-5">
-          {/* NAME */}
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">
               Shoe Name
@@ -84,12 +86,11 @@ export default function AddProductPage() {
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none transition"
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
               required
             />
           </div>
 
-          {/* BRAND */}
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">
               Brand
@@ -98,12 +99,11 @@ export default function AddProductPage() {
               type="text"
               value={brand}
               onChange={(e) => setBrand(e.target.value)}
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none transition"
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
               required
             />
           </div>
 
-          {/* PRICE & STOCK */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">
@@ -113,7 +113,7 @@ export default function AddProductPage() {
                 type="number"
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none transition"
+                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                 required
               />
             </div>
@@ -126,13 +126,12 @@ export default function AddProductPage() {
                 type="number"
                 value={stock}
                 onChange={(e) => setStock(e.target.value)}
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none transition"
+                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                 required
               />
             </div>
           </div>
 
-          {/* SIZES */}
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">
               Sizes
@@ -142,12 +141,11 @@ export default function AddProductPage() {
               placeholder="e.g. 7,8,9"
               value={sizes}
               onChange={(e) => setSizes(e.target.value)}
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none transition"
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
               required
             />
           </div>
 
-          {/* IMAGES */}
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">
               Product Images
@@ -157,12 +155,11 @@ export default function AddProductPage() {
               multiple
               accept="image/*"
               onChange={(e) => setImages(e.target.files)}
-              className="w-full px-3 py-2 border rounded-lg bg-slate-50 cursor-pointer"
+              className="w-full px-3 py-2 border rounded-lg bg-slate-50"
               required
             />
           </div>
 
-          {/* DESCRIPTION */}
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">
               Description
@@ -171,16 +168,15 @@ export default function AddProductPage() {
               rows="4"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none transition resize-none"
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none resize-none"
               required
             />
           </div>
 
-          {/* SUBMIT */}
           <button
             type="submit"
             disabled={loading}
-            className="w-full mt-6 py-3 rounded-lg bg-indigo-600 text-white font-semibold hover:bg-indigo-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full mt-6 py-3 rounded-lg bg-indigo-600 text-white font-semibold hover:bg-indigo-700 disabled:opacity-50"
           >
             {loading ? "Adding Product..." : "Add Product"}
           </button>

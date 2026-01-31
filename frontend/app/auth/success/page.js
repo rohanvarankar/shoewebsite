@@ -1,30 +1,44 @@
 "use client";
 
-import { useEffect, Suspense } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 
-function AuthSuccessContent() {
-  const searchParams = useSearchParams();
+export default function AuthSuccessPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     const token = searchParams.get("token");
 
-    if (token) {
-      localStorage.setItem("token", token);
-      router.replace("/");
-    } else {
-      router.replace("/SignIn");
+    if (!token) {
+      router.push("/signin");
+      return;
     }
-  }, [searchParams, router]);
 
-  return <p className="text-center mt-10">Signing you in...</p>;
-}
+    // Save token
+    localStorage.setItem("token", token);
 
-export default function AuthSuccessPage() {
-  return (
-    <Suspense fallback={<p className="text-center mt-10">Loading...</p>}>
-      <AuthSuccessContent />
-    </Suspense>
-  );
+    // Decode JWT payload
+    const payload = JSON.parse(atob(token.split(".")[1]));
+
+    // Save user info
+    localStorage.setItem(
+      "user",
+      JSON.stringify({
+        id: payload.id,
+        email: payload.email,
+        role: payload.role,
+        isBlocked: payload.isBlocked
+      })
+    );
+
+    // Redirect based on role
+    if (payload.role === "admin") {
+      router.push("/admin/dashboard");
+    } else {
+      router.push("/");
+    }
+  }, []);
+
+  return <p>Signing you in...</p>;
 }
