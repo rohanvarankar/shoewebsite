@@ -1,30 +1,28 @@
-"use client";
-
 import {
   LineChart,
   Line,
   XAxis,
   YAxis,
+  CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  CartesianGrid,
 } from "recharts";
 
 export default function RevenueChart({ data }) {
   return (
-    <div className="bg-white rounded-xl shadow p-5 h-80">
-      <h3 className="font-semibold mb-4">Revenue Trend</h3>
+    <div className="bg-white p-5 rounded-xl shadow">
+      <h3 className="font-semibold mb-4">Revenue (Last 7 Days)</h3>
 
-      <ResponsiveContainer width="100%" height="100%">
+      <ResponsiveContainer width="100%" height={300}>
         <LineChart data={data}>
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="date" />
+          <XAxis dataKey="_id" />
           <YAxis />
           <Tooltip />
           <Line
             type="monotone"
             dataKey="revenue"
-            strokeWidth={3}
+            strokeWidth={2}
           />
         </LineChart>
       </ResponsiveContainer>

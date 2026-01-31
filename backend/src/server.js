@@ -1,5 +1,7 @@
 import dotenv from "dotenv";
+import adminAnalyticsRoutes from "./routes/admin/admin.analytics.routes.js";
 
+app.use("/api/admin/analytics", adminAnalyticsRoutes);
 // 🔹 Load environment variables FIRST
 dotenv.config();
 

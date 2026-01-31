@@ -1,50 +1,62 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import StatCard from "../_components/StatCard";
-import RevenueChart from "../_components/charts/RevenueChart";
-import OrdersChart from "../_components/charts/OrdersChart";
 
-export default function AdminDashboard() {
-  const [metrics, setMetrics] = useState(null);
+import DashboardStats from "../_components/DashboardStats";
+import RevenueChart from "../_components/RevenueChart";
+import OrderStatusChart from "../_components/OrderStatusChart";
+import RecentOrders from "../_components/RecentOrders";
+import AIInsights from "../_components/AIInsights";
+
+export default function AdminDashboardPage() {
+  const [dashboardData, setDashboardData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchMetrics = async () => {
-      const token = localStorage.getItem("token");
+    const fetchDashboardData = async () => {
+      try {
+        const token = localStorage.getItem("token");
 
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/admin/analytics/dashboard`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+        const res = await fetch(
+          "http://localhost:5000/api/admin/analytics/dashboard",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
-      const data = await res.json();
-      setMetrics(data.metrics);
+        if (!res.ok) throw new Error("Failed to fetch analytics");
+
+        const data = await res.json();
+        setDashboardData(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    fetchMetrics();
+    fetchDashboardData();
   }, []);
 
-  if (!metrics) return;
+  if (loading) return <p className="p-4">Loading dashboard...</p>;
+  if (error) return <p className="p-4 text-red-500">{error}</p>;
+  if (!dashboardData) return <p className="p-4">No data</p>;
 
   return (
-    <div className="space-y-8">
-      {/* METRIC CARDS */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard title="Users" value={metrics.totalUsers} />
-        <StatCard title="Products" value={metrics.totalProducts} />
-        <StatCard title="Orders" value={metrics.totalOrders} />
-        <StatCard title="Revenue" value={`₹${metrics.totalRevenue}`} />
+    <div className="space-y-6">
+      <DashboardStats stats={dashboardData.stats} />
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <RevenueChart data={dashboardData.last7DaysRevenue} />
+        <OrderStatusChart data={dashboardData.ordersByStatus} />
       </div>
 
-      {/* CHARTS */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <RevenueChart data={metrics.revenueTrend} />
-        <OrdersChart data={metrics.orderTrend} />
-      </div>
+      <RecentOrders orders={dashboardData.recentOrders} />
+
+      <AIInsights insights={dashboardData.advancedInsights} />
     </div>
   );
 }

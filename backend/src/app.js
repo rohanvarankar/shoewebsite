@@ -9,6 +9,7 @@ import authRoutes from "./routes/authRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import cartRoutes from "./routes/cartRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js"; 
+import adminAnalyticsRoutes from "./routes/admin/admin.analytics.routes.js";
 import adminRoutes from "./routes/admin/admin.routes.js";// ✅ NEW
 
 // 🔹 IMPORTANT: load Google OAuth strategy
@@ -45,5 +46,6 @@ app.use("/api/cart", cartRoutes);
 app.use("/api/orders", orderRoutes); // ✅ REGISTERED
 app.use("/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/admin/analytics", adminAnalyticsRoutes);
 
 export default app;
